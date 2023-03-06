@@ -16,15 +16,15 @@ if (isset($_POST["submitButton"])){
     //DB接続 
     try {
       $pdo = new PDO('mysql:host=localhost;dbname=auth_php', "root", "");
-      $sql = "SELECT count(*) FROM `users` where email=? and password=?;";
+      $sql = "SELECT * FROM `users` where email=?;";
       $stmt = $pdo->prepare($sql);
-      $stmt->execute(array($email, $password));//ここで?に指定
+      $stmt->execute(array($email));//ここで?に指定
       $result = $stmt->fetch();
       //DBの接続を閉じる
       $stmt = null;
       $pdo = null;
       
-      if ($result[0] != 0){
+      if (password_verify($password, $result['password'])){
         header('Location: home.php');
         
       } else {
@@ -55,10 +55,10 @@ if (isset($_POST["submitButton"])){
     </div>
     <div class="login_form_btm">
       <?php 
-        if(isset($error_array["email_error"]) || isset($error_array["password_error"])){
+        if(isset($_POST["submitButton"]) && (isset($error_array["email_error"]) || isset($error_array["password_error"]))){
           echo '<span style="color:#FF0000;">入力漏れがあります</span>';
         } 
-        elseif(isset($error_msg)){
+        elseif(isset($_POST["submitButton"]) && isset($error_msg)){
           echo '<span style="color:#FF0000;">メールアドレスかパスワードが誤りです</span>';
         }
         ?></br>

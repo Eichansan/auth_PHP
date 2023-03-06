@@ -29,12 +29,12 @@ if (isset($_POST["submitButton"]) && $_POST['password']==$_POST['conf_pass']){
     $conf_pass = $_POST['conf_pass']; 
     $created_at = date("Y-m-d H:i:s");
 
-    //DB接続 
     try {
+      //DB接続 
       $pdo = new PDO('mysql:host=localhost;dbname=auth_php', "root", "");
       $sql = "INSERT INTO `users`(fullname, phone, email, password, created_at) values(?, ?, ?, ?, ?);";
       $stmt = $pdo->prepare($sql);
-      $stmt->execute(array($fullname, $phone, $email, $password, $created_at));//ここで?に指定
+      $stmt->execute(array($fullname, $phone, $email, password_hash($password, PASSWORD_DEFAULT), $created_at));//ここで?に指定
       //DBの接続を閉じる
       $stmt = null;
       $pdo = null;
@@ -65,9 +65,9 @@ if (isset($_POST["submitButton"]) && $_POST['password']==$_POST['conf_pass']){
     </div>
     <div class="login_form_btm">
       <?php 
-        if(isset($error_array["name_error"]) || isset($error_array["phone_error"]) || isset($error_array["email_error"]) || isset($error_array["password_error"]) || isset($error_array["conf_error"])){
+        if(isset($_POST["submitButton"]) && (isset($error_array["name_error"]) || isset($error_array["phone_error"]) || isset($error_array["email_error"]) || isset($error_array["password_error"]) || isset($error_array["conf_error"]))){
           echo '<span style="color:#FF0000;">入力漏れがあります</span>';
-        } elseif($_POST['password']!=$_POST['conf_pass']){
+        } elseif(isset($_POST["submitButton"]) && $_POST['password']!=$_POST['conf_pass']){
           echo '<span style="color:#FF0000;">パスワードと確認用パスワードが異なります</span>';
         }
         ?></br>
